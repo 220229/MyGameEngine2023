@@ -15,6 +15,9 @@ void ChildObject::Initialize()
 {
 	pFbx = new Fbx;
 	pFbx->Load("Assets/oden.fbx");
+
+
+
 	this->transform_.position_.x = 4.0f;
 	this->transform_.scale_ = { 0.1f,0.1f ,0.1f };
 }
@@ -32,6 +35,6 @@ void ChildObject::Draw()
 
 void ChildObject::Release()
 {
-	
+
 }
 

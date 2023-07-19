@@ -29,7 +29,7 @@ public:
 	void UpdateSub();
 	void ReleaseSub();
 
-	void KillMe();
+	void KillMe();	
 
 	//位置・角度・大きさを設定する
 	void SetTransform(Transform _transform);
@@ -41,6 +41,10 @@ public:
 	void SetScale(float _x, float _y, float _z);
 
 	void MirrorPosition(GameObject* _object);
+
+	GameObject* FindChildObject(string _objName);
+	GameObject* GetRootJob();
+	GameObject* FindObject(string _objName);
 
 	//位置・角度・大きさを取得する
 	Transform GetTransform() { return this->transform_; }

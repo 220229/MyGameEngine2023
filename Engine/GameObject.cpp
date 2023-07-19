@@ -100,3 +100,35 @@ void GameObject::MirrorPosition(GameObject* _object)
 {
 	SetPosition(-_object->GetPosition().x, -_object->GetPosition().y, -_object->GetPosition().z);
 }
+
+GameObject* GameObject::FindChildObject(string _objName)
+{
+	if (_objName == this->objectName_)
+	{
+		return (this);
+	}
+	else
+	{
+		//for (auto itr=childList_.begin();itr != childList_.end(); itr++)
+		for (auto itr: childList_)
+		{
+			GameObject* obj = itr->FindChildObject(_objName);
+			if (obj != nullptr)
+				return obj;
+		}
+	}
+	return nullptr;
+}
+
+GameObject* GameObject::GetRootJob()
+{
+	if (pParent_ == nullptr)
+		return this;
+
+	return pParent_->GetRootJob();
+}
+
+GameObject* GameObject::FindObject(string _objName)
+{
+	return GetRootJob()->FindChildObject(_objName);
+}

@@ -1,30 +1,14 @@
 #pragma once
 #include "Engine/GameObject.h"
 
-class Fbx;
 
-class Player :
+class TestScene :
     public GameObject
 {
-    int hModel;
-   
 public:
-    //コンストラクタ
-    Player(GameObject* parent);
-
-    //デストラクタ
-    ~Player();
-
-    //初期化
+    TestScene(GameObject* parent);
     void Initialize() override;
-
-    //更新
     void Update() override;
-
-    //描画
     void Draw() override;
-
-    //開放
     void Release() override;
 };
-

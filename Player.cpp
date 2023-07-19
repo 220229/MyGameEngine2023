@@ -2,9 +2,10 @@
 #include "Engine/Fbx.h"
 #include "ChildObject.h"
 #include "Engine/Input.h"
+#include "Engine/Model.h"
 
 Player::Player(GameObject* parent)
-	:GameObject(parent,"Player"), pFbx(nullptr)
+	:GameObject(parent, "Player"),hModel(-1)
 {
 }
 
@@ -15,8 +16,8 @@ Player::~Player()
 
 void Player::Initialize()
 {
-	pFbx = new Fbx;
-	pFbx->Load("Assets/oden.fbx");
+	hModel = Model::Load("Assets/Oden.fbx");
+
 	this->transform_.scale_.x = 0.5;
 	this->transform_.scale_.y = 0.5;
 	this->transform_.scale_.z = 0.5;
@@ -43,7 +44,7 @@ void Player::Update()
 
 void Player::Draw()
 {
-	pFbx->Draw(transform_);
+	Model::SetTransform(hModel, transform_);
 }
 
 void Player::Release()

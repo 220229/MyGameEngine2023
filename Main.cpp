@@ -1,11 +1,11 @@
 //インクルード
 #include <Windows.h>
 #include <stdlib.h>
-
 #include "Engine/Direct3D.h"
 #include "Engine/Camera.h"
 #include "Engine/Input.h"
 #include "Engine/RootJob.h"
+#include "Engine/Model.h"
 
 #pragma comment(lib, "winmm.lib")
 
@@ -78,8 +78,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, 
 	//DirectInputの初期化
 	Input::Initialize(hWnd);
 
-	pRootJob = new RootJob;
+	pRootJob = new RootJob(nullptr);
 	pRootJob->Initialize();
+
 
 	//メッセージループ（何か起きるのを待つ）
 	MSG msg;
@@ -96,15 +97,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, 
 		//メッセージなし
 		else
 		{
-			//GetTimeの精度向上
 			timeBeginPeriod(1);
 
 			static DWORD countFps = 0;
-
-			//ウィンドウ起動後、何mm秒かかったかを取得
 			static DWORD startTime = timeGetTime();
 			DWORD nowTime = timeGetTime();
 			static DWORD lastUpdateTime = nowTime;
+
 			if (nowTime - startTime >= 1000)
 			{
 				char str[16];
@@ -115,17 +114,18 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, 
 				startTime = nowTime;
 			}
 
-			if ((nowTime - lastUpdateTime)*60 <= 1000)
+			if ((nowTime - lastUpdateTime) * 60 <= 1000)
 			{
 				continue;
 			}
 			lastUpdateTime = nowTime;
 
+
 			countFps++;
 
-			//debug用
-			//SetWindowText(hWnd, str);
-			
+
+
+
 			timeEndPeriod(1);
 
 			//▼ゲームの処理
@@ -145,7 +145,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, 
 			Direct3D::EndDraw();
 		}
 	}
+
+	Model::Release();
 	pRootJob->ReleaseSub();
+	SAFE_DELETE(pRootJob);
+
 	Input::Release();
 	Direct3D::Release();
 

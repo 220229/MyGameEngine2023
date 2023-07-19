@@ -15,7 +15,7 @@ namespace Model
 		Transform transform_;
 		Fbx* fbx_;
 	};
-	std::vector<ModelData*> modelList_;
+	
 
 	//////////////////////////////////////////
 
@@ -40,5 +40,7 @@ namespace Model
 	void Draw(int _hModel);
 
 	//////////////////////////////////////////
+
+	void Release();
 
 }
