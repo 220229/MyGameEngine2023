@@ -1,6 +1,6 @@
-#include "SceneManager.h"
 #include "SphereCollider.h"
 
-SphereCollider::SphereCollider(float _r)
+SphereCollider::SphereCollider(float _radius)
+	:radius_(_radius)
 {
 }
