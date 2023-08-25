@@ -50,17 +50,8 @@
     <ClCompile Include="Engine\GameObject.cpp">
       <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="PlayScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\RootJob.cpp">
       <Filter>ソース ファイル\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="ChildObject.cpp">
-      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Model.cpp">
       <Filter>ソース ファイル\Engine</Filter>
@@ -70,6 +61,9 @@
     </ClCompile>
     <ClCompile Include="TestScene.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\SphereCollider.cpp">
+      <Filter>ソース ファイル\Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -110,15 +104,6 @@
     <ClInclude Include="Engine\RootJob.h">
       <Filter>ヘッダーファイル\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="ChildObject.h">
-      <Filter>ヘッダーファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>ヘッダーファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayScene.h">
-      <Filter>ヘッダーファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Model.h">
       <Filter>ヘッダーファイル\Engine</Filter>
     </ClInclude>
@@ -127,6 +112,9 @@
     </ClInclude>
     <ClInclude Include="TestScene.h">
       <Filter>ヘッダーファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\SphereCollider.h">
+      <Filter>ヘッダーファイル\Engine</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

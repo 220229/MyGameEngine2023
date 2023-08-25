@@ -52,6 +52,9 @@ public:
 	XMFLOAT3  GetRotate() { return this->transform_.rotate_; }
 	XMFLOAT3  GetScale() { return this->transform_.scale_; }
 
+	//コライダー用の関数
+	//void AddCollider(SphereCollider* _pCollider);
+
 	template <class T>
 	T* Instantiate(GameObject* parent)
 	{
