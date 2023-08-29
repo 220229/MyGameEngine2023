@@ -15,9 +15,21 @@ Stage::~Stage()
 //初期化
 void Stage::Initialize()
 {
+    string modelname[] = {
+        "BoxDefault.fbx",
+        "BoxBrick.fbx",
+        "BoxGrass.fbx",
+        "BoxSand.fbx",
+        "BoxWater.fbx",
+    };
+    string fname_base = "assets/";
+
     //モデルデータのロード
-    hModel_ = Model::Load("assets/BoxDefault.fbx");
-    assert(hModel_ >= 0);
+    for (int i = 0; i < MODEL_NUM; i++)
+    {
+        hModel_[i] = Model::Load(fname_base + modelname[i]);
+        assert(hModel_[i] >= 0);
+    }
 }
 
 //更新
@@ -37,8 +49,8 @@ void Stage::Draw()
             Transform trans;
             trans.position_.x = x;
             trans.position_.z = z;
-            Model::SetTransform(hModel_, trans);
-            Model::Draw(hModel_);
+            Model::SetTransform(hModel_[(x + z) % 5], trans);
+            Model::Draw(hModel_[(x + z) % 5]);
         }
     }
 }
