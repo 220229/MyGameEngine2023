@@ -1,5 +1,6 @@
 #include "Stage.h"
 #include "Engine/Model.h"
+#include "resource.h"
 
 void Stage::SetBlock(int _x, int _z, BLOCKTYPE _type)
 {
@@ -89,4 +90,18 @@ void Stage::Draw()
 //開放
 void Stage::Release()
 {
+}
+
+//偽物のダイヤログプロシージャ
+BOOL Stage::DialogProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
+{
+	switch (msg)
+	{
+		//ダイヤログ出来た
+	case WM_INITDIALOG:
+		SendMessage(GetDlgItem(hDlg, IDC_RADIO_UP), BM_SETCHECK, BST_CHECKED, BST_UNCHECKED);
+		return TRUE;
+
+	}
+	return FALSE;
 }
