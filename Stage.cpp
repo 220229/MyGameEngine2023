@@ -92,15 +92,16 @@ void Stage::Release()
 {
 }
 
-//偽物のダイヤログプロシージャ
-BOOL Stage::DialogProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
+
+//偽物のダイアログプロシージャ
+BOOL  Stage::DialogProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 {
 	switch (msg)
 	{
-		//ダイヤログ出来た
+		//ダイアログできた
 	case WM_INITDIALOG:
 		//ラジオボタンの初期値
-		SendMessage(GetDlgItem(hDlg, IDC_RADIO_UP), BM_SETCHECK, BST_CHECKED, BST_UNCHECKED);
+		SendMessage(GetDlgItem(hDlg, IDC_RADIO_UP), BM_SETCHECK, BST_CHECKED, 0);
 
 		//コンボボックスの初期値
 		SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING, 0, (LPARAM)"デフォルト");
@@ -108,7 +109,9 @@ BOOL Stage::DialogProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 		SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING, 0, (LPARAM)"草原");
 		SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING, 0, (LPARAM)"砂地");
 		SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING, 0, (LPARAM)"水");
-		SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING, 0, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_SETCURSEL, 0, 0);
+
+
 
 		return TRUE;
 
