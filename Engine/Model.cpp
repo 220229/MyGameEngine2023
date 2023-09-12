@@ -1,64 +1,56 @@
-#include "Model.h"
+﻿#include "Model.h"
 #include "Direct3D.h"
 
-namespace Model
-{
-	std::vector<ModelData*> modelList_;
+namespace Model {
+
+	//モデルのポインタをぶち込んでおくベクタ
+	std::vector<ModelData*> modelList;
 }
 
-int Model::Load(string _fileName)
+int Model::Load(std::string fileName)
 {
-	//���f���f�[�^��ݒ�
 	ModelData* pData;
 	pData = new ModelData;
-	
-	//���f��::�t�@�C���l�[����ݒ�
-	pData->fileName_ = _fileName;
+	pData->filename_ = fileName;
+	pData->pfbx_ = nullptr;
 
-
-	//���f��::�������f�[�^��ݒ�
-	
-	
-	for (auto e : modelList_) {
-		if (e->fileName_ == _fileName){
-			pData->fbx_ = e->fbx_;
+	//ファイルネームが同じだったら、読まん！
+	for (auto& e : modelList)
+	{
+		if (e->filename_ == fileName) {
+			pData->pfbx_ = e->pfbx_;
 			break;
 		}
 	}
 
-	pData->fbx_ = nullptr;
-	if (!pData->fbx_) {
-		pData->fbx_ = new Fbx;
-		pData->fbx_->Load(_fileName);
+	if (pData->pfbx_ == nullptr)
+	{
+		pData->pfbx_ = new Fbx;
+		pData->pfbx_->Load(fileName);
 	}
 
-	//���f�����X�g�ɒǉ�
-	modelList_.push_back(pData);
-
-	//���X���̉��Ԗڂɒǉ����ꂽ�̂���Ԃ�
-	return (modelList_.size()-1);
+	modelList.push_back(pData);
+	return(modelList.size() - 1);
 }
 
-void Model::SetTransform(int _hModel, Transform _transform)
+void Model::SetTransform(int hModel, Transform transform)
 {
-	//�g�����X�t�H�[����ݒ�
-	modelList_[_hModel]->transform_ = _transform;
+	modelList[hModel]->transform_ = transform;
+	//モデル番号は、modelListのインデックス
 }
-
-void Model::Draw(int _hModel)
-{
-	//�`��
-	modelList_[_hModel]->fbx_->Draw(modelList_[_hModel]->transform_);
+void Model::Draw(int hModel) {
+	//モデル番号は、modelListのインデックス
+	modelList[hModel]->pfbx_->Draw(modelList[hModel]->transform_);
 }
 
 void Model::Release()
 {
-	bool isReffered = false; //�Q�Ƃ���Ă��邩
-	for (int i=0;i<modelList_.size();i++)
+	bool isReffered = false; //参照されてる？
+	for (int i = 0; i < modelList.size(); i++)
 	{
-		for (int j = i + 1; j < modelList_.size(); j++)
+		for (int j = i + 1; j < modelList.size(); j++)
 		{
-			if (modelList_[i]->fbx_ == modelList_[j]->fbx_)
+			if (modelList[i]->pfbx_ == modelList[j]->pfbx_)
 			{
 				isReffered = true;
 				break;
@@ -66,9 +58,39 @@ void Model::Release()
 		}
 		if (isReffered == false)
 		{
-			SAFE_DELETE(modelList_[i]->fbx_)
+			SAFE_DELETE(modelList[i]->pfbx_);
 		}
-		SAFE_DELETE(modelList_[i])
+		SAFE_DELETE(modelList[i]);
 	}
-	modelList_.clear();
+	modelList.clear();
+}
+
+void Model::RayCast(int hModel, RayCastData& rayData)
+{
+	//⓪モデルのトランスフォームをカリキュレーション
+	modelList[hModel]->transform_.Calclation();
+	//①ワールド行列の逆行列
+	XMMATRIX wInv = XMMatrixInverse(nullptr,
+		modelList[hModel]->transform_.GetWorldMatrix());
+
+	//②レイの通過点を求める(モデル空間での例の方向ベクトルを求める）
+	XMVECTOR vpass{ rayData.start.x + rayData.dir.x,
+					rayData.start.y + rayData.dir.y,
+					rayData.start.z + rayData.dir.z,
+					rayData.start.w + rayData.dir.w };
+
+	//③rayData.startをモデル空間に変換（①をかける）
+	XMVECTOR vstart = XMLoadFloat4(&rayData.start);
+	vstart = XMVector3TransformCoord(vstart, wInv); //tarnsformcoordはw要素を無視してくれるらしい
+	XMStoreFloat4(&rayData.start, vstart);
+
+	//④（始点から方向ベクトルをちょい伸ばした先）通過点（②）に①をかける
+	vpass = XMVector3TransformCoord(vpass, wInv);
+
+	//⑤rayData.dirを③から④に向かうベクトルにする（引き算）
+	vpass = vpass - vstart;
+	XMStoreFloat4(&rayData.dir, vpass);
+
+	//指定したモデル番号のFBXにレイキャスト！
+	modelList[hModel]->pfbx_->RayCast(rayData);
 }
