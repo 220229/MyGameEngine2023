@@ -4,7 +4,7 @@
 #include "Engine/Camera.h"
 #include "Engine/Fbx.h"
 #include "resource.h"
-
+HWND hDlg;
 
 void Stage::SetBlock(int _x, int _z, BLOCKTYPE _type)
 {
@@ -61,9 +61,11 @@ void Stage::Initialize()
 
 }
 
+
 //更新
 void Stage::Update()
 {
+	
 	if (!Input::IsMouseButtonDown(0)) {
 		return;
 	}
@@ -99,6 +101,13 @@ void Stage::Update()
 	//④　③にinvVP、invPrj、invViewをかける
 	vMouseBack = XMVector3TransformCoord(vMouseBack, invVP * invProj * invView);
 
+	
+
+	
+		
+
+
+
 	for (int x = 0; x < 15; x++)
 	{
 		for (int z = 0; z < 15; z++)
@@ -120,8 +129,16 @@ void Stage::Update()
 				//⑥　レイが当たったらブレークポイントで止める
 				if (data.hit)
 				{
-					table_[x][z].height++;
-					break;
+					if (mode_ == 0)
+					{
+						table_[x][z].height++;
+						break;
+					}
+					else if (mode_ == 1)
+					{
+						table_[x][z].height--;
+						break;
+					}
 				}
 
 			}
@@ -176,5 +193,15 @@ BOOL Stage::DialogProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 		SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_SETCURSEL, 0,0);
 
 	}
+
+	if (SendMessage(GetDlgItem(hDlg, IDC_RADIO_UP), BM_GETCHECK, 0, 0) == BST_CHECKED)
+	{
+		mode_ = 0;
+	}
+	else if (SendMessage(GetDlgItem(hDlg, IDC_RADIO_DOWN), BM_GETCHECK, 0, 0) == BST_CHECKED)
+	{
+		mode_ = 1;
+	}
+
 	return FALSE;
-}
+	}
