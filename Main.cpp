@@ -189,9 +189,35 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);  //ÉvÉçÉOÉâÉÄèIóπ
 		return 0;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case ID_MENU_NEW:
+			OutputDebugString("new FILE");
+				break;
+
+		case ID_MENU_OPEN:
+			OutputDebugString("open FILE");
+			break;
+
+		case ID_MENU_SAVE:
+			OutputDebugString("Save FILE");
+			break;
+
+
+			return 0;
+		}
+
+
+
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
+
+
+
+
 
 BOOL CALLBACK DialogProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 {
