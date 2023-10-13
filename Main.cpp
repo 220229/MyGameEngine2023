@@ -224,3 +224,8 @@ BOOL CALLBACK DialogProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 	Stage* pStage = (Stage*)pRootJob->FindObject("Stage");
 	return pStage->DialogProc(hDlg, msg, wp, lp);
 }
+
+
+
+
+

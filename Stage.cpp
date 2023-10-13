@@ -205,3 +205,67 @@ BOOL Stage::DialogProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 
 	return FALSE;
 	}
+
+void Stage::Save()
+{
+	char fileName[MAX_PATH] = "無題.map";
+	std::string buffer;
+	std::stringstream oss;
+
+
+	//OPENFILENAME構造体を初期化
+	OPENFILENAME ofn; {
+		ZeroMemory(&ofn, sizeof(ofn));
+		ofn.lStructSize = sizeof(OPENFILENAME);
+		ofn.lpstrFilter = TEXT("マップデータ(*.map)\0*.map\0");
+		ofn.lpstrFile = fileName;
+		ofn.nMaxFile = MAX_PATH;
+		ofn.Flags = OFN_OVERWRITEPROMPT;
+		ofn.lpstrDefExt = TEXT("map");
+	}
+
+	//ファイルに保存
+	DWORD dwBytes = 0;  //書き込み位置
+	WriteFile(
+		hFile,                   //ファイルハンドル
+		●●●,                  //保存するデータ（文字列）
+		(DWORD)strlen(●●●),   //書き込む文字数
+		&dwBytes,                //書き込んだサイズを入れる変数
+		NULL);                   //オーバーラップド構造体（今回は使わない）
+}
+
+void Stage::Load()
+{
+	char fileName[MAX_PATH] = "無題.map";
+	std::string buffer;
+	std::stringstream oss;
+
+	//OPENFILENAME構造体を初期化
+	OPENFILENAME ofn; {
+		ZeroMemory(&ofn, sizeof(ofn));
+		ofn.lStructSize = sizeof(OPENFILENAME);
+		ofn.lpstrFilter = TEXT("マップデータ(*.map)\0*.map\0");
+		ofn.lpstrFile = fileName;
+		ofn.nMaxFile = MAX_PATH;
+		ofn.Flags = OFN_FILEMUSTEXIST;
+		ofn.lpstrDefExt = TEXT("map");
+		ofn.lpstrDefExt;
+	}
+
+	//ファイルを開く
+	//ファイルのサイズを取得
+	DWORD fileSize = GetFileSize(hFile, NULL);
+
+	//ファイルのサイズ分メモリを確保
+	char* data;
+	data = new char[fileSize];
+
+	DWORD dwBytes = 0; //読み込み位置
+
+	ReadFile(
+		hFile,     //ファイルハンドル
+		data,      //データを入れる変数
+		fileSize,  //読み込むサイズ
+		&dwBytes,  //読み込んだサイズ
+		NULL);     //オーバーラップド構造体（今回は使わない）
+}
