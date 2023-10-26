@@ -4,7 +4,7 @@
 #include "Engine/Camera.h"
 #include "Engine/Fbx.h"
 #include "resource.h"
-HWND hDlg;
+
 
 void Stage::SetBlock(int _x, int _z, BLOCKTYPE _type)
 {
@@ -18,7 +18,7 @@ void Stage::SetBlockHeight(int _x, int _z, int _height)
 
 //コンストラクタ
 Stage::Stage(GameObject* parent)
-	:GameObject(parent, "Stage")
+	:GameObject(parent, "Stage"), mode_(0), select_(0)
 {
 	for (int i = 0; i < MODEL_NUM; i++) {
 		hModel_[i] = -1;
@@ -61,11 +61,9 @@ void Stage::Initialize()
 
 }
 
-
 //更新
 void Stage::Update()
 {
-	
 	if (!Input::IsMouseButtonDown(0)) {
 		return;
 	}
@@ -101,12 +99,8 @@ void Stage::Update()
 	//④　③にinvVP、invPrj、invViewをかける
 	vMouseBack = XMVector3TransformCoord(vMouseBack, invVP * invProj * invView);
 
-	
-
-	
-		
-
-
+	int bufX = -1, bufZ;
+	float minDistance = 9999999;
 
 	for (int x = 0; x < 15; x++)
 	{
@@ -129,20 +123,33 @@ void Stage::Update()
 				//⑥　レイが当たったらブレークポイントで止める
 				if (data.hit)
 				{
-					if (mode_ == 0)
+					if (minDistance > data.dist)
 					{
-						table_[x][z].height++;
-						break;
-					}
-					else if (mode_ == 1)
-					{
-						table_[x][z].height--;
-						break;
+						minDistance = data.dist;
+						bufX = x;
+						bufZ = z;
 					}
 				}
 
 			}
-
+		}
+	}
+	if (bufX >= 0)
+	{
+		switch (mode_)
+		{
+		case 0:
+			table_[bufX][bufZ].height++;
+			break;
+		case 1:
+			if (table_[bufX][bufZ].height > 0)
+			{
+				table_[bufX][bufZ].height--;
+			}
+			break;
+		case 2:
+			table_[bufX][bufZ].type = select_;
+			break;
 		}
 	}
 }
@@ -183,28 +190,38 @@ BOOL Stage::DialogProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 	{
 	case WM_INITDIALOG:
 		SendMessage(GetDlgItem(hDlg, IDC_RADIO_UP), BM_SETCHECK, BST_CHECKED, 0);
-
-		SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING,0,(LPARAM)"デフォルト");
+		SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING, 0, (LPARAM)"デフォルト");
 		SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING, 0, (LPARAM)"レンガ");
 		SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING, 0, (LPARAM)"草原");
 		SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING, 0, (LPARAM)"砂地");
 		SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING, 0, (LPARAM)"水");
+		SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_SETCURSEL, 0, 0);
+		return TRUE;
 
-		SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_SETCURSEL, 0,0);
+	case WM_COMMAND:
+		switch (LOWORD(wp))
+		{
+		case IDC_RADIO_UP:
+			mode_ = 0;
+			return TRUE;
+
+		case IDC_RADIO_DOWN:
+			mode_ = 1;
+			return TRUE;
+
+		case IDC_RADIO_CHANGE:
+			mode_ = 2;
+			return TRUE;
+
+		case IDC_COMBO1:
+			select_ = (int)SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_GETCURSEL, 0, 0);
+			return TRUE;
+		}
+		return FALSE;
 
 	}
-
-	if (SendMessage(GetDlgItem(hDlg, IDC_RADIO_UP), BM_GETCHECK, 0, 0) == BST_CHECKED)
-	{
-		mode_ = 0;
-	}
-	else if (SendMessage(GetDlgItem(hDlg, IDC_RADIO_DOWN), BM_GETCHECK, 0, 0) == BST_CHECKED)
-	{
-		mode_ = 1;
-	}
-
 	return FALSE;
-	}
+}
 
 void Stage::Save()
 {
@@ -227,27 +244,39 @@ void Stage::Save()
 
 	//キャンセルしたら中断
 	if (selFile == FALSE) return;
-}
 
-void Stage::Load()
-{
-	char fileName[MAX_PATH] = "無題.map";  //ファイル名を入れる変数
 
-	//「ファイルを保存」ダイアログの設定
-	OPENFILENAME ofn;                         	//名前をつけて保存ダイアログの設定用構造体
-	ZeroMemory(&ofn, sizeof(ofn));            	//構造体初期化
-	ofn.lStructSize = sizeof(OPENFILENAME);   	//構造体のサイズ
-	ofn.lpstrFilter = TEXT("マップデータ(*.map)\0*.map\0")        //─┬ファイルの種類
-		TEXT("すべてのファイル(*.*)\0*.*\0\0");     //─┘
-	ofn.lpstrFile = fileName;               	//ファイル名
-	ofn.nMaxFile = MAX_PATH;               	//パスの最大文字数
-	ofn.Flags = OFN_FILEMUSTEXIST;   		//フラグ（同名ファイルが存在したら上書き確認）
-	ofn.lpstrDefExt = "map";                  	//デフォルト拡張子
 
-	//「ファイルを開く」ダイアログ
-	BOOL selFile;
-	selFile = GetOpenFileName(&ofn);
+	HANDLE hFile;
+	hFile = CreateFile(
+		fileName,    //ファイル名
+		GENERIC_WRITE,  //アクセスモード
+		0,
+		NULL,
+		CREATE_ALWAYS,     //作成方法
+		FILE_ATTRIBUTE_NORMAL,
+		NULL
+	);
 
-	//キャンセルしたら中断
-	if (selFile == FALSE) return;
+	std::string data = "";
+
+
+
+	//data.length()
+
+
+	DWORD bytes = 0;
+	WriteFile(
+		hFile,              //ファイルハンドル
+		"ABCDEF",          //保存したい文字列
+		12,                  //保存する文字数
+		&bytes,             //保存したサイズ
+		NULL
+	);
+
+
+
+	CloseHandle(hFile);
+
+
 }
