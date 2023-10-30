@@ -150,6 +150,9 @@ void Stage::Update()
 		case 2:
 			table_[bufX][bufZ].type = select_;
 			break;
+		case 3:
+			table_[bufX][bufZ].height=0;
+			break;
 		}
 	}
 }
@@ -211,6 +214,10 @@ BOOL Stage::DialogProc(HWND hDlg, UINT msg, WPARAM wp, LPARAM lp)
 
 		case IDC_RADIO_CHANGE:
 			mode_ = 2;
+			return TRUE;
+
+		case IDC_RADIO_RESET:
+			mode_ = 3;
 			return TRUE;
 
 		case IDC_COMBO1:
